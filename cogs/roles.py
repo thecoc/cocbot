@@ -17,7 +17,7 @@ class Roles:
         self.bot = bot
         self.roles = self.bot.server_info['allowed_roles']
         self.aliases = transpose_aliases(self.bot.server_info['role_aliases'])
-        self.mispellings = self.bot.server_info['mispellings']
+        self.mispellings = self.bot.server_info['mispellings'] #currently unused
     
     @commands.command(pass_context=True,
                       brief='Set your tag to an available role')
@@ -35,13 +35,13 @@ class Roles:
 
         role = self.aliases.get(role, role) # expand alias if present, or itself
     
-        if role not in self.roles and role not in self.aliases:
+        if role not in self.roles: #among rolles allowed to (un)tag
             raise commands.BadArgument('Tag doesn\'t exist!')
 
         roles = ctx.message.server.roles
         member = ctx.message.author
         found = find(lambda r: str(r).lower() == role, roles)
-        # TODO: check for valid aliases
+
         await fn(member, discord.Object(id=found.id))
         return str(found)
             
