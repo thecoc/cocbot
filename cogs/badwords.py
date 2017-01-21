@@ -20,10 +20,10 @@ class BadWords:
         str = ', '.join(words)
         member = msg.author
         
-        pm = f'Terms like [ {str} ] are not allowed here'
+        pm = 'Terms like [ %s ] are not allowed here' % str
         await self.bot.send_message(member, pm)
         
-        to_mod = f'{member} used the following words: [ {str} ]'
+        to_mod = '%s used the following words: [ %s ]' % (member, str)
         channel = discord.Object(id=self.mod_id)
         await self.bot.send_message(channel, to_mod)
 

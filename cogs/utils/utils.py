@@ -4,7 +4,7 @@ import discord
 
 async def reply(bot, ctx, msg):
     channel = ctx.message.channel
-    response = f'{ctx.message.author.mention}: {msg}'
+    response = ctx.message.author.mention + ', ' + msg
     await bot.send_message(channel, response)
 
 async def say(bot, ctx, msg):
