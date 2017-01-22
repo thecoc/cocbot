@@ -5,7 +5,8 @@ import json
 import threading
 import os
 
-bot_channel='234066444449480704'
+# bot_channel='234066444449480704'
+bot_channel='271117684395999243' # test.bot-log
 
 extensions = [ 'cogs.games',
                'cogs.media',
@@ -24,6 +25,12 @@ async def on_ready():
 
 @bot.event
 async def on_command_error(error, ctx):
+    import traceback
+    import sys
+    msg = str(error) + '\n'
+    msg += ("".join(traceback.format_exception(None, error, error.__traceback__)))
+    print(msg, file=sys.stderr)
+
     if isinstance(error, commands.CommandOnCooldown):
         #error.retry_after => time left
         await utils.whisper(bot, ctx, str(error))
@@ -31,7 +38,7 @@ async def on_command_error(error, ctx):
         await utils.reply(bot, ctx, str(error))
     else:
         channel = discord.Object(id=bot_channel)
-        await bot.send_message(channel, str(error))
+        await bot.send_message(channel, msg)
 
 @bot.event
 async def on_message(msg):
