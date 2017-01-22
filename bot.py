@@ -36,9 +36,12 @@ async def on_command_error(error, ctx):
         await utils.whisper(bot, ctx, str(error))
     elif isinstance(error, commands.BadArgument):
         await utils.reply(bot, ctx, str(error))
+    elif isinstance(error, commands.errors.CommandNotFound):
+        await utils.reply(bot, ctx, 'Command not found.')
     else:
         channel = discord.Object(id=bot_channel)
         await bot.send_message(channel, msg)
+
 
 @bot.event
 async def on_message(msg):
@@ -52,6 +55,11 @@ def load_file(file):
 
 def start(port, token):
     import web.server as ws
+
+    if not os.getenv('WEBSERVER', False):
+        # don't run as/with web server: bot only
+        bot.run(token)
+        return
 
     server_runner = threading.Thread(target=lambda: ws.run(port=port))
     server_runner.start()
