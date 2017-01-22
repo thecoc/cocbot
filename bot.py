@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
     bot.server_info = load_file('server.json')
     token = bot.server_info['credentials']['token']
-    port = os.getenv('NODE_PORT', 3000)
+    port = os.getenv('HTTPPORT', 3000)
 
     for extension in extensions:
         try:
