@@ -4,6 +4,8 @@ from functools import partial
 import discord
 
 def transpose_aliases(aliases):
+    # mapping from each alias to their real role name
+    # input is of form: {role: [aliases]}
     transposed = {}
     for role, aliases in aliases.items():
         for alias in aliases:

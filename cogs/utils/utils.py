@@ -2,16 +2,16 @@ import requests
 import random
 import discord
 
-async def reply(bot, ctx, msg):
+async def reply(ctx, msg):
     channel = ctx.message.channel
     response = ctx.message.author.mention + ', ' + msg
-    await bot.send_message(channel, response)
+    await ctx.bot.send_message(channel, response)
 
-async def say(bot, ctx, msg):
-    await bot.send_message(ctx.message.channel, msg)
+async def say(ctx, msg):
+    await ctx.bot.send_message(ctx.message.channel, msg)
 
-async def whisper(bot, ctx, msg):
-    await bot.send_message(ctx.message.author, msg)
+async def whisper(ctx, msg):
+    await ctx.bot.send_message(ctx.message.author, msg)
     
 def lines_from_url(url):
     r = requests.get(url)

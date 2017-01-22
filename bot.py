@@ -33,15 +33,15 @@ async def on_command_error(error, ctx):
 
     if isinstance(error, commands.CommandOnCooldown):
         #error.retry_after => time left
-        await utils.whisper(bot, ctx, str(error))
+        await utils.whisper(ctx, str(error))
     elif isinstance(error, commands.BadArgument):
-        await utils.reply(bot, ctx, str(error))
+        await utils.reply(ctx, str(error))
     elif isinstance(error, commands.errors.CommandNotFound):
-        await utils.reply(bot, ctx, str(error))
+        await utils.reply(ctx, str(error))
     else:
         channel = discord.Object(id=bot_channel)
         await bot.send_message(channel, msg)
-        await utils.reply(bot, ctx, str(error))
+        await utils.reply(ctx, str(error))
 
 @bot.event
 async def on_message(msg):
