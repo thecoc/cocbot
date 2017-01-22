@@ -37,11 +37,11 @@ async def on_command_error(error, ctx):
     elif isinstance(error, commands.BadArgument):
         await utils.reply(bot, ctx, str(error))
     elif isinstance(error, commands.errors.CommandNotFound):
-        await utils.reply(bot, ctx, 'Command not found.')
+        await utils.reply(bot, ctx, str(error))
     else:
         channel = discord.Object(id=bot_channel)
         await bot.send_message(channel, msg)
-
+        await utils.reply(bot, ctx, str(error))
 
 @bot.event
 async def on_message(msg):
