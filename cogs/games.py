@@ -12,17 +12,23 @@ class Games:
         self.eightball_url = self.bot.server_info['urls']['8ball']
         self.topics_url = self.bot.server_info['urls']['topics']
         
-    @commands.command(pass_context=True, 
-                      aliases=['8ball'],
+    @commands.command(name = '8ball', 
+                      pass_context=True, 
                       brief='Ask the 8-ball.. if you dare!')
-    async def eightball(self, ctx):
+    async def _8ball(self, ctx, *, question):
         await self.bot.reply(random_line(self.eightball_url))
         
     @commands.command(pass_context=True,
                       brief='Request a random conversation starter')
     async def topic(self, ctx):
         await self.bot.reply(random_line(self.topics_url))
-        
+
+    async def on_command_error(self, error, ctx):
+        if not utils.error_in_cog(ctx, self):
+            return
+        if isinstance(error, commands.MissingRequiredArgument):
+            response = 'I\'m drawing a blank. Oh.. that\'s probably because you gave me NOTHING!'
+            await utils.reply(ctx, response)        
         
 def setup(bot):
     bot.add_cog(Games(bot))
