@@ -84,5 +84,5 @@ if __name__ == '__main__':
             print('Failed to load extension {}\n{}: {}'.format(
                 extension, type(e).__name__, e))
 
-    start(port, token)
+    start(int(port), token)
 
