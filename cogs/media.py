@@ -1,9 +1,9 @@
 from discord.ext import commands
-from cogs.utils import tumblr
+from cogs.utils import tumblr, utils
 import random
 
 # TODO: multiple cooldowns + error messages
-DEFAULT_COOLDOWN = 60
+DEFAULT_COOLDOWN = 30
 
 class Media:
 
@@ -18,17 +18,22 @@ class Media:
         brief='Request a random image from our Tumblr page')
     @commands.cooldown(1, DEFAULT_COOLDOWN)
     async def poster(self):
-        await self.bot.reply(self.photo_set(tag=self.tag))
-
-    @commands.command(
-        brief='Request a random image post from our Tumblr page')
-    @commands.cooldown(1, DEFAULT_COOLDOWN)
-    async def tumblr(self):
-        await self.bot.reply(self.random_post(tag=self.tag))
+        post = self.random_post(tag=self.tag)
+        response = post['summary'] + '\ntumblr post @ ' 
+        response += '<' + post['short_url'] + '>\n'
+        response += self.photo_set(post)
+        await self.bot.reply(response)
+    
+    async def on_command_error(self, error, ctx):
+        if not utils.error_in_cog(ctx, self):
+            return
+        if isinstance(error, commands.CommandOnCooldown):
+            #error.retry_after => time left
+            response = self.cooldown_error(error.retry_after)
+            await utils.whisper(ctx, response)            
         
-    def photo_set(self, **params):
-        post = self.random_photo(**params)['posts'][0]
-        urls = map(lambda p: p['original_size']['url'], post['photos'])
+    def photo_set(self, post):
+        urls = [p['original_size']['url'] for p in post['photos']]
         return '\n'.join(urls)
            
     def random_photo(self, **params):
@@ -37,8 +42,13 @@ class Media:
         return self.client.photos(limit=1, offset=index, **params)
 
     def random_post(self, **params):
-        post = self.random_photo(**params)['posts'][0]
-        return post['short_url']
+        return self.random_photo(**params)['posts'][0]
+    
+    def cooldown_error(self, retry_after):
+        error = 'Dude, you\'re interrupting my Netflix! '
+        error += 'I\'ll get to your command in: '
+        error += '{:.2f}s'.format(retry_after)
+        return error
         
                        
 def setup(bot):
