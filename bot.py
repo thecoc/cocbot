@@ -23,6 +23,8 @@ async def on_ready():
     print('ID: ' + bot.user.id)
     print('------')
 
+
+    
 @bot.event
 async def on_command_error(error, ctx):
     import traceback
@@ -30,13 +32,16 @@ async def on_command_error(error, ctx):
     msg = str(error) + '\n'
     msg += ("".join(traceback.format_exception(None, error, error.__traceback__)))
     print(msg, file=sys.stderr)
-
+    # let cogs handle their own errors
     if isinstance(error, commands.CommandOnCooldown):
-        #error.retry_after => time left
-        await utils.whisper(ctx, str(error))
+        pass
+    elif isinstance(error, commands.MissingRequiredArgument):
+        pass
+    elif isinstance(error, commands.TooManyArguments):
+        pass
     elif isinstance(error, commands.BadArgument):
-        await utils.reply(ctx, str(error))
-    elif isinstance(error, commands.errors.CommandNotFound):
+        pass
+    elif isinstance(error, commands.CommandNotFound):
         await utils.reply(ctx, str(error))
     else:
         channel = discord.Object(id=bot_channel)
