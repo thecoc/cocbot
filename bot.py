@@ -4,6 +4,9 @@ import discord
 import json
 import threading
 import os
+import sys
+
+import crypto
 
 # bot_channel='234066444449480704'
 bot_channel='271117684395999243' # test.bot-log
@@ -28,7 +31,6 @@ async def on_ready():
 @bot.event
 async def on_command_error(error, ctx):
     import traceback
-    import sys
     msg = str(error) + '\n'
     msg += ("".join(traceback.format_exception(None, error, error.__traceback__)))
     print(msg, file=sys.stderr)
@@ -71,7 +73,19 @@ def start(port, token):
     bot.run(token)
 #     server_runner.join() - don't wait for server to stop if bot closes
 
-if __name__ == '__main__':
+
+def main():
+
+    cryptokey = os.getenv('CRYPTOKEY', '').encode('utf-8')
+
+    # handle differnt modes and cmd args
+    if len(sys.argv) == 3: 
+        if sys.argv[1] == 'enc':
+            crypto.file_encrypt(cryptokey, sys.argv[2])
+            return
+        if sys.argv[1] == 'dec':
+            crypto.file_decrypt(cryptokey, sys.argv[2])
+            return
 
     bot.server_info = load_file('server.json')
     token = bot.server_info['credentials']['token']
@@ -86,3 +100,5 @@ if __name__ == '__main__':
 
     start(int(port), token)
 
+if __name__ == '__main__':
+    main()
