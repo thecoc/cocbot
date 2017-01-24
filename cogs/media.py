@@ -3,7 +3,7 @@ from cogs.utils import tumblr, utils
 import random
 
 # TODO: multiple cooldowns + error messages
-DEFAULT_COOLDOWN = 30
+DEFAULT_COOLDOWN = 5
 
 class Media:
 
@@ -30,16 +30,24 @@ class Media:
         if isinstance(error, commands.CommandOnCooldown):
             #error.retry_after => time left
             response = self.cooldown_error(error.retry_after)
-            await utils.whisper(ctx, response)            
+            await utils.whisper(ctx, response)  
+        elif isinstance(error, commands.CommandInvokeError):
+            response = 'Well.. something went wrong. '
+            response += 'Just so we\'re clear, it wasn\'t my fault. '
+            response += '[ ' + str(error.original) + ' ]'
+            await utils.reply(ctx, response)
         
     def photo_set(self, post):
         urls = [p['original_size']['url'] for p in post['photos']]
         return '\n'.join(urls)
            
     def random_photo(self, **params):
-        total_photos = self.client.total_photos(**params)
-        index = random.randrange(total_photos)
-        return self.client.photos(limit=1, offset=index, **params)
+        try:
+            total_photos = self.client.total_photos(**params)
+            index = random.randrange(total_photos)
+            return self.client.photos(limit=1, offset=index, **params)
+        except Exception as e:
+            raise commands.CommandInvokeError(e)       
 
     def random_post(self, **params):
         return self.random_photo(**params)['posts'][0]
