@@ -35,7 +35,7 @@ class Roles:
 
         assigned = await self.modify_roles(ctx, role)
         await self.bot.reply('You are now tagged as: ' + assigned)
-        
+
     async def on_command_error(self, error, ctx):
         if not utils.error_in_cog(ctx, self):
             return
@@ -45,7 +45,7 @@ class Roles:
             await utils.reply(ctx, 'you can only have one tag. Don\'t be greedy')
         elif isinstance(error, commands.BadArgument):
             await utils.reply(ctx, 'you\'re just making up words now. ' + self.role_error())
-        
+
     async def modify_roles(self, ctx, role):
         member = ctx.message.author
         server_roles = ctx.message.server.roles
@@ -53,10 +53,10 @@ class Roles:
         new_roles = list(set(member.roles) - tags)
         new_role = du.get(server_roles, name=role.title())
         new_roles.append(new_role)
-        await self.bot.replace_roles(member, new_roles)
+        await self.bot.replace_roles(member, *new_roles)
         return str(new_role)
-        
-        
+
+
     def role_error(self):
         #roles = map(lambda r: r.title(), self.roles)
         roles = [r.title() for r in self.roles]

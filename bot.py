@@ -48,7 +48,7 @@ async def on_command_error(error, ctx):
         await utils.reply(ctx, response)
     else:
         channel = discord.Object(id=bot_channel)
-        await bot.send_message(channel, msg)
+        await bot.send_message(channel, '```\n' + msg + '\n```')
         await utils.reply(ctx, str(error))
 
 @bot.event
