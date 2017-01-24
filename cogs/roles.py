@@ -53,7 +53,7 @@ class Roles:
         new_roles = list(set(member.roles) - tags)
         new_role = du.get(server_roles, name=role.title())
         new_roles.append(new_role)
-        self.bot.replace_roles(member, new_roles)
+        await self.bot.replace_roles(member, new_roles)
         return str(new_role)
         
         
