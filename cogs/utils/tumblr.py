@@ -9,12 +9,10 @@ class Client:
         self.key = key  
 
     def get(self, method='info', **params):
-        url = (self.base_url + method
-               + ('/' + params.get("type") if params.get('type') else ''))
+        type = params.get('type')
+        url = self.base_url + method + ('/' + type) if type else ''
         params['api_key']=self.key
-        r = requests.get(url, params=params)
-        r.raise_for_status()
-        return r.json()['response']
+        return requests.get(url, params=params).json()
    
     def info(self):
         return self.get('info')
@@ -26,7 +24,12 @@ class Client:
         return self.posts(type='photo', **params)['total_posts']
         
     def posts(self, **params):
-        return self.get(method='posts', **params)
+        posts = self.get(method='posts', **params)
+        if not posts['response']:
+            status = posts['meta']['status']
+            msg = posts['meta']['msg']
+            raise Exception(status, msg)
+        return posts['response']
         
     def photos(self, **params):
         return self.posts(type='photo', **params)
