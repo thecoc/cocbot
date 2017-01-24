@@ -42,7 +42,8 @@ async def on_command_error(error, ctx):
     elif isinstance(error, commands.BadArgument):
         pass
     elif isinstance(error, commands.CommandNotFound):
-        await utils.reply(ctx, str(error))
+        response = 'seems like you want something from me. Too bad I have no clue what'
+        await utils.reply(ctx, response)
     else:
         channel = discord.Object(id=bot_channel)
         await bot.send_message(channel, msg)
