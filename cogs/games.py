@@ -27,7 +27,7 @@ class Games:
         if not utils.error_in_cog(ctx, self):
             return
         if isinstance(error, commands.MissingRequiredArgument):
-            response = 'I\'m drawing a blank. Oh.. that\'s probably because you gave me NOTHING!'
+            response = 'I\'m drawing a blank. Oh.. that\'s probably because you didn\'t give me anything to work with'
             await utils.reply(ctx, response)        
         
 def setup(bot):

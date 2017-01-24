@@ -40,11 +40,11 @@ class Roles:
         if not utils.error_in_cog(ctx, self):
             return
         if isinstance(error, commands.MissingRequiredArgument):
-            await utils.reply(ctx, 'I can\'t tag nothing')
+            await utils.reply(ctx, 'I can\'t tag nothing. I mean.. I could. I just don\'t want to')
         elif isinstance(error, commands.TooManyArguments):
-            await utils.reply(ctx, 'You can only have one tag. Don\'t be greedy')
+            await utils.reply(ctx, 'you can only have one tag. Don\'t be greedy')
         elif isinstance(error, commands.BadArgument):
-            await utils.reply(ctx, 'You\'re just making up words now. ' + self.role_error())
+            await utils.reply(ctx, 'you\'re just making up words now. ' + self.role_error())
         
     async def modify_roles(self, ctx, role):
         member = ctx.message.author
