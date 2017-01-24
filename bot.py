@@ -74,6 +74,12 @@ def start(port, token):
     bot.run(token)
 #     server_runner.join() - don't wait for server to stop if bot closes
 
+def assert_settings(cryptokey):
+    if not os.path.isfile('server.json'):
+        if os.path.isfile('server.json.aes'):
+            crypto.file_decrypt(cryptokey, 'server.json')
+        else:
+            raise Exception('missing: server.json')
 
 def main():
 
@@ -87,6 +93,8 @@ def main():
         if sys.argv[1] == 'dec':
             crypto.file_decrypt(cryptokey, sys.argv[2])
             return
+
+    assert_settings(cryptokey)
 
     bot.server_info = load_file('server.json')
     token = bot.server_info['credentials']['token']
