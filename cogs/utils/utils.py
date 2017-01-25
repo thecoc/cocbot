@@ -3,6 +3,7 @@ from functools import wraps
 import requests
 import random
 import discord
+import traceback
 
 async def reply(ctx, msg):
     channel = ctx.message.channel
@@ -26,9 +27,12 @@ def random_line_from_source(source, fn):
 def mention(ctx, msg):
     return ctx.message.author.mention + ', ' + msg
     
-class CogResponse:
-    def __init__(self, message='', channel=None):
-        self.message = message
-        self.channel = channel
+async def report_traceback(error, ctx):
+    event = '{0.timestamp}\n{1}\n'.format(ctx.message, error)
+    event += '{0.author.mention}: {0.content}\n'.format(ctx.message)    channels = ctx.message.server.channels
+    log_channel = du.get(channels, name='bot-log')
+    tb = traceback.format_exception(type(error), error, error.__traceback__)
+    log_msg = event + '\n' + ''.join(tb)
+    await ctx.bot.send_message(log_channel, log_msg) 
     
     

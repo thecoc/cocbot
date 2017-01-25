@@ -36,12 +36,9 @@ class Media:
         return '\n'.join(urls)
            
     def random_photo(self, **params):
-        try:
-            total_photos = self.client.total_photos(**params)
-            index = random.randrange(total_photos)
-            return self.client.photos(limit=1, offset=index, **params)
-        except Exception as e:
-            raise commands.CommandError(e)       
+        total_photos = self.client.total_photos(**params)
+        index = random.randrange(total_photos)
+        return self.client.photos(limit=1, offset=index, **params)      
 
     def random_post(self, **params):
         return self.random_photo(**params)['posts'][0]

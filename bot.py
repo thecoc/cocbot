@@ -6,7 +6,6 @@ import json
 import threading
 import os
 import sys
-import traceback
 
 import crypto
 
@@ -27,36 +26,32 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
- 
-async def report_traceback(error, ctx):
-    channels = ctx.message.server.channels
-    log_channel = du.get(channels, name='bot-log')
-    log_msg = str(error) + '\n' + traceback.format_exc()
-    await ctx.bot.send_message(log_channel, log_msg) 
+    
+@bot.command()
+async def logout():
+    await bot.logout()
     
 @bot.event
 async def on_command_error(error, ctx):
-    # BUG: when prepare_error exists and doesn't handle error
-    # empty msg
-    if hasattr(ctx.cog, 'prepare_error'):
-        response = ctx.cog.prepare_error(error, ctx)
-        msg = response['msg']
-        channel = response.get('channel', ctx.message.channel)
-    elif isinstance(error, commands.CommandNotFound):
+    if isinstance(error, commands.CommandNotFound):
         msg = 'How dare you ask me for that. I\'m not that kind of bot!'
         msg = utils.mention(ctx, msg)
-        channel = ctx.message.channel
+        channel = ctx.message.channel  
     else:
-        msg = 'Well.. something went wrong. '
-        msg += 'Just so we\'re clear, it wasn\'t my fault. '
-        msg += '[ ' + str(error.original) + ' ]'
-        channel = ctx.message.channel
-        
-        channels = ctx.message.server.channels
-        bot_channel = du.get(channels, name='bot-log')
-        bot_msg = str(error) + '\n' + traceback.format_exc()
-        await bot.send_msesage(bot_channel, bot_msg)
-    
+        try:
+            response = ctx.cog.prepare_error(error, ctx)
+            msg = response['msg']
+            channel = response.get('channel', ctx.message.channel)   
+        #except (NameError, TypeError, ValueError, AttributeError):
+        except Exception:
+            msg = 'Well.. something went wrong. '
+            msg += 'Just so we\'re clear, it wasn\'t my fault. '
+            msg += '[ ' + str(error.original) + ' ]'
+            msg = utils.mention(ctx, msg)
+            channel = ctx.message.channel
+            
+            await utils.report_traceback(error, ctx)
+            
     await bot.send_message(channel, msg)
         
 @bot.event

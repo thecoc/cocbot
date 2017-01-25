@@ -1,5 +1,5 @@
 import requests
-
+from requests.exceptions import HTTPError
 class Client:
 
     def __init__(self, key, blogname=None):
@@ -11,7 +11,7 @@ class Client:
     def get(self, method='info', **params):
         type = params.get('type')
         url = self.base_url + method + ('/' + type) if type else ''
-        params['api_key']=self.key
+        #params['api_key']=self.key
         return requests.get(url, params=params).json()
    
     def info(self):
@@ -26,9 +26,7 @@ class Client:
     def posts(self, **params):
         posts = self.get(method='posts', **params)
         if not posts['response']:
-            status = posts['meta']['status']
-            msg = posts['meta']['msg']
-            raise Exception(status, msg)
+            raise HTTPError(posts['meta']['status'], posts['meta']['msg'])
         return posts['response']
         
     def photos(self, **params):
