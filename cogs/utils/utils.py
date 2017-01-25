@@ -1,4 +1,5 @@
 from discord.ext import commands
+from functools import wraps
 import requests
 import random
 import discord
@@ -22,7 +23,12 @@ def lines_from_url(url):
 def random_line_from_source(source, fn):
     return random.choice(fn(source))
     
-def error_in_cog(ctx, cog):
-    return cog is ctx.cog
+def mention(ctx, msg):
+    return ctx.message.author.mention + ', ' + msg
+    
+class CogResponse:
+    def __init__(self, message='', channel=None):
+        self.message = message
+        self.channel = channel
     
     

@@ -1,10 +1,12 @@
 from discord.ext import commands
 from cogs.utils import utils
+import discord.utils as du
 import discord
 import json
 import threading
 import os
 import sys
+import traceback
 
 import crypto
 
@@ -25,32 +27,38 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
-
-
+ 
+async def report_traceback(error, ctx):
+    channels = ctx.message.server.channels
+    log_channel = du.get(channels, name='bot-log')
+    log_msg = str(error) + '\n' + traceback.format_exc()
+    await ctx.bot.send_message(log_channel, log_msg) 
     
 @bot.event
 async def on_command_error(error, ctx):
-    import traceback
-    msg = str(error) + '\n'
-    msg += ("".join(traceback.format_exception(None, error, error.__traceback__)))
-    print(msg, file=sys.stderr)
-    # let cogs handle their own errors
-    if isinstance(error, commands.CommandOnCooldown):
-        pass
-    elif isinstance(error, commands.MissingRequiredArgument):
-        pass
-    elif isinstance(error, commands.TooManyArguments):
-        pass
-    elif isinstance(error, commands.BadArgument):
-        pass
+    # BUG: when prepare_error exists and doesn't handle error
+    # empty msg
+    if hasattr(ctx.cog, 'prepare_error'):
+        response = ctx.cog.prepare_error(error, ctx)
+        msg = response['msg']
+        channel = response.get('channel', ctx.message.channel)
     elif isinstance(error, commands.CommandNotFound):
-        response = 'seems like you want something from me. Too bad I have no clue what'
-        await utils.reply(ctx, response)
+        msg = 'How dare you ask me for that. I\'m not that kind of bot!'
+        msg = utils.mention(ctx, msg)
+        channel = ctx.message.channel
     else:
-        channel = discord.Object(id=bot_channel)
-        await bot.send_message(channel, '```\n' + msg + '\n```')
-        await utils.reply(ctx, str(error))
-
+        msg = 'Well.. something went wrong. '
+        msg += 'Just so we\'re clear, it wasn\'t my fault. '
+        msg += '[ ' + str(error.original) + ' ]'
+        channel = ctx.message.channel
+        
+        channels = ctx.message.server.channels
+        bot_channel = du.get(channels, name='bot-log')
+        bot_msg = str(error) + '\n' + traceback.format_exc()
+        await bot.send_msesage(bot_channel, bot_msg)
+    
+    await bot.send_message(channel, msg)
+        
 @bot.event
 async def on_message(msg):
     if msg.author.bot:
@@ -107,7 +115,9 @@ def main():
             print('Failed to load extension {}\n{}: {}'.format(
                 extension, type(e).__name__, e))
 
-    start(int(port), token)
+    token = 'MjczMTU1NTg2ODEwNTc2ODk2.C2fbfQ.2iIcxe7W1z1fh4Vl04kQNdooR1Q'
+    #start(int(port), token)
+    bot.run(token)
 
 if __name__ == '__main__':
     main()

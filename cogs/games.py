@@ -21,14 +21,12 @@ class Games:
     @commands.command(pass_context=True,
                       brief='Request a random conversation starter')
     async def topic(self, ctx):
-        await self.bot.reply(random_line(self.topics_url))
-
-    async def on_command_error(self, error, ctx):
-        if not utils.error_in_cog(ctx, self):
-            return
+        await self.bot.reply(random_line(self.topics_url)) 
+     
+    def prepare_error(self, error, ctx):
         if isinstance(error, commands.MissingRequiredArgument):
-            response = 'I\'m drawing a blank. Oh.. that\'s probably because you didn\'t give me anything to work with'
-            await utils.reply(ctx, response)        
+            msg = 'I\'m drawing a blank. Oh.. that\'s probably because you didn\'t give me anything to work with'
+            return {'msg':utils.mention(ctx, msg)}
         
 def setup(bot):
     bot.add_cog(Games(bot))
