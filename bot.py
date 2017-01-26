@@ -23,22 +23,23 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
-    
+
 @bot.command()
 async def logout():
+    print('logout requested: shutting down...')
     await bot.logout()
-    
+
 @bot.event
 async def on_command_error(error, ctx):
     if isinstance(error, commands.CommandNotFound):
         msg = 'How dare you ask me for that. I\'m not that kind of bot!'
         msg = utils.mention(ctx, msg)
-        channel = ctx.message.channel  
+        channel = ctx.message.channel
     else:
         try:
             response = ctx.cog.prepare_error(error, ctx)
             msg = response['msg']
-            channel = response.get('channel', ctx.message.channel)   
+            channel = response.get('channel', ctx.message.channel)
         #except (NameError, TypeError, ValueError, AttributeError):
         except Exception:
             msg = 'Well.. something went wrong. '
@@ -46,11 +47,11 @@ async def on_command_error(error, ctx):
             msg += '[ ' + str(error.original) + ' ]'
             msg = utils.mention(ctx, msg)
             channel = ctx.message.channel
-            
+
             await utils.report_traceback(error, ctx)
-            
+
     await bot.send_message(channel, msg)
-        
+
 @bot.event
 async def on_message(msg):
     if msg.author.bot:
@@ -95,7 +96,7 @@ def main():
     cryptokey = os.getenv('CRYPTOKEY', '').encode('utf-8')
 
     # handle differnt modes and cmd args
-    if len(sys.argv) == 3: 
+    if len(sys.argv) == 3:
         if sys.argv[1] == 'enc':
             crypto.file_encrypt(cryptokey, sys.argv[2])
             return
