@@ -33,7 +33,7 @@ async def report_traceback(error, ctx):
     channels = ctx.message.server.channels
     log_channel = du.get(channels, name='bot-log')
     tb = traceback.format_exception(type(error), error, error.__traceback__)
-    log_msg = event + '\n' + ''.join(tb)
+    log_msg = '```\n' + event + '\n' + ''.join(tb) + '\n```'
     await ctx.bot.send_message(log_channel, log_msg) 
     
     
