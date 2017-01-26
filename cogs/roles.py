@@ -18,8 +18,8 @@ class Roles:
     def __init__(self, bot):
         self.bot = bot
         # both must contain lower case only
-        self.roles = self.bot.server_info['allowed_roles']
-        self.aliases = transpose_aliases(self.bot.server_info['role_aliases'])
+        self.roles = self.bot.config['allowed_roles']
+        self.aliases = transpose_aliases(self.bot.config['role_aliases'])
 
     @commands.command(pass_context=True,
                       brief='Set your tag to an available role',
@@ -47,7 +47,7 @@ class Roles:
             msg = 'you\'re just making up words now. '
             msg += self.role_error()
             return {'msg':utils.mention(ctx, msg)}
-            
+
     async def modify_roles(self, ctx, role):
         member = ctx.message.author
         server_roles = ctx.message.server.roles
@@ -57,8 +57,8 @@ class Roles:
         new_roles.append(new_role)
         await self.bot.replace_roles(member, *new_roles)
         return str(new_role)
-        
-        
+
+
     def role_error(self):
         #roles = map(lambda r: r.title(), self.roles)
         roles = [r.title() for r in self.roles]

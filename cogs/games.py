@@ -9,8 +9,8 @@ class Games:
 
     def __init__(self, bot):
         self.bot = bot
-        self.eightball_url = self.bot.server_info['urls']['8ball']
-        self.topics_url = self.bot.server_info['urls']['topics']
+        self.eightball_url = self.bot.config['urls']['8ball']
+        self.topics_url = self.bot.config['urls']['topics']
         
     @commands.command(name = '8ball', 
                       pass_context=True, 

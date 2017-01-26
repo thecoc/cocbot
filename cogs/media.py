@@ -9,9 +9,9 @@ class Media:
 
     def __init__(self, bot):
         self.bot = bot
-        self.key = self.bot.server_info['tumblr']['key']
-        self.blogname = self.bot.server_info['tumblr']['blogname']
-        self.tag = self.bot.server_info['tumblr']['default_tag']
+        self.key = self.bot.config['tumblr']['key']
+        self.blogname = self.bot.config['tumblr']['blogname']
+        self.tag = self.bot.config['tumblr']['default_tag']
         self.client = tumblr.Client(self.key, blogname=self.blogname)
     
 

@@ -96,8 +96,8 @@ def main():
 
     assert_settings(cryptokey)
 
-    bot.server_info = load_file('server.json')
-    token = bot.server_info['credentials']['token']
+    bot.config = load_file('server.json')
+    token = bot.config['credentials']['token']
     port = os.getenv('PORT', 3000)
 
     for extension in extensions:

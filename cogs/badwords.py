@@ -7,8 +7,8 @@ class BadWords:
 
     def __init__(self, bot):
         self.bot = bot
-        self.badwords_url = self.bot.server_info['urls']['badwords']
-        #self.mod_id = self.bot.server_info['channels']['moderators']
+        self.badwords_url = self.bot.config['urls']['badwords']
+        #self.mod_id = self.bot.config['channels']['moderators']
         self.badwords = utils.lines_from_url(self.badwords_url)
         
     async def on_message(self, msg):
