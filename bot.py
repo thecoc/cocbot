@@ -9,9 +9,6 @@ import sys
 
 import crypto
 
-# bot_channel='234066444449480704'
-bot_channel='271117684395999243' # test.bot-log
-
 extensions = [ 'cogs.games',
                'cogs.media',
                'cogs.roles',
@@ -110,9 +107,7 @@ def main():
             print('Failed to load extension {}\n{}: {}'.format(
                 extension, type(e).__name__, e))
 
-    token = 'MjczMTU1NTg2ODEwNTc2ODk2.C2fbfQ.2iIcxe7W1z1fh4Vl04kQNdooR1Q'
-    #start(int(port), token)
-    bot.run(token)
+    start(int(port), token)
 
 if __name__ == '__main__':
     main()
