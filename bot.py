@@ -75,11 +75,20 @@ def start(port, token):
 #     server_runner.join() - don't wait for server to stop if bot closes
 
 def assert_settings(cryptokey):
-    if not os.path.isfile('server.json'):
-        if os.path.isfile('server.json.aes'):
-            crypto.file_decrypt(cryptokey, 'server.json')
+    if not os.path.isfile('config.json'):
+        if os.path.isfile('config.json.aes'):
+            crypto.file_decrypt(cryptokey, 'config.json')
         else:
-            raise Exception('missing: server.json')
+            raise Exception('missing: config.json')
+
+def select_token(config):
+    name = os.getenv('TOKEN_NAME', 'dbg')
+    token = config['token'][name]
+
+    if not token:
+        raise Exception('TOKEN_NAME(%s) not found in config.' % name)
+
+    return token
 
 def main():
 
@@ -96,8 +105,7 @@ def main():
 
     assert_settings(cryptokey)
 
-    bot.config = load_file('server.json')
-    token = bot.config['credentials']['token']
+    bot.config = load_file('config.json')
     port = os.getenv('PORT', 3000)
 
     for extension in extensions:
@@ -107,7 +115,7 @@ def main():
             print('Failed to load extension {}\n{}: {}'.format(
                 extension, type(e).__name__, e))
 
-    start(int(port), token)
+    start(int(port), select_token(bot.config))
 
 if __name__ == '__main__':
     main()
