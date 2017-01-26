@@ -29,7 +29,8 @@ def mention(ctx, msg):
     
 async def report_traceback(error, ctx):
     event = '{0.timestamp}\n{1}\n'.format(ctx.message, error)
-    event += '{0.author.mention}: {0.content}\n'.format(ctx.message)    channels = ctx.message.server.channels
+    event += '{0.author.mention}: {0.content}\n'.format(ctx.message)
+    channels = ctx.message.server.channels
     log_channel = du.get(channels, name='bot-log')
     tb = traceback.format_exception(type(error), error, error.__traceback__)
     log_msg = event + '\n' + ''.join(tb)
