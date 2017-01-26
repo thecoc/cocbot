@@ -53,18 +53,12 @@ def slurpb(name):
     with open(name, 'rb') as f:
         return f.read()
 
-#this padding will be permanent, but is not a problem for .json
-def pad16(data):
-    """pads data with trailing spaces, 
-    so length is multiple of 16"""
-    return data + (b' ' * (len(data) % 16))
-
 
 def file_encrypt(key, fname, aesname=None):
     if aesname is None:
         aesname = fname + '.aes'
 
-    data = ivencrypt(key, pad16(slurpb(fname)))
+    data = ivencrypt(key, slurpb(fname))
     spitb(aesname, data)
 
 def file_decrypt(key, fname, aesname=None):
