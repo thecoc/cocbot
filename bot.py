@@ -9,6 +9,9 @@ import sys
 
 import crypto
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 extensions = [ 'cogs.games',
                'cogs.media',
                'cogs.roles',
