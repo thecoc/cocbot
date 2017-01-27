@@ -1,5 +1,5 @@
 from discord.ext import commands
-from functools import wraps
+import discord.utils as du
 import requests
 import random
 import discord
@@ -16,14 +16,6 @@ async def say(ctx, msg):
 async def whisper(ctx, msg):
     await ctx.bot.send_message(ctx.message.author, msg)
     
-def lines_from_url(url):
-    r = requests.get(url)
-    r.raise_for_status()
-    return r.text.split('\r\n')
-    
-def random_line_from_source(source, fn):
-    return random.choice(fn(source))
-    
 def mention(ctx, msg):
     return ctx.message.author.mention + ', ' + msg
     
@@ -34,6 +26,15 @@ async def report_traceback(error, ctx):
     log_channel = du.get(channels, name='bot-log')
     tb = traceback.format_exception(type(error), error, error.__traceback__)
     log_msg = event + '\n' + ''.join(tb)
-    await ctx.bot.send_message(log_channel, log_msg) 
+    await ctx.bot.send_message(log_channel, log_msg)
+    
+def lines_from_url(url):
+    r = requests.get(url)
+    r.raise_for_status()
+    return r.text.split('\r\n')
+    
+def random_line_from_source(source, fn):
+    return random.choice(fn(source))
+
     
     

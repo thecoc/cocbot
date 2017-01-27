@@ -1,2 +1,5 @@
-*.json
+venv
 *.pyc
+staticfiles
+.env
+*.json
