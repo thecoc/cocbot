@@ -64,22 +64,9 @@ async def on_message(msg):
        return
     await bot.process_commands(msg)
 
-def load_file(file):
+def load_json(file):
     with open(file) as f:
         return json.load(f)
-
-def start(port, token):
-    import web.server as ws
-
-    if not os.getenv('WEBSERVER', False):
-        # don't run as/with web server: bot only
-        bot.run(token)
-        return
-
-    server_runner = threading.Thread(target=lambda: ws.run(port=port))
-    server_runner.start()
-    bot.run(token)
-#     server_runner.join() - don't wait for server to stop if bot closes
 
 def assert_settings(cryptokey):
     if not os.path.isfile('config.json'):
@@ -112,8 +99,7 @@ def main():
 
     assert_settings(cryptokey)
 
-    bot.config = load_file('config.json')
-    port = os.getenv('PORT', 3000)
+    bot.config = load_json('config.json')
 
     for extension in extensions:
         try:
@@ -122,7 +108,7 @@ def main():
             print('Failed to load extension {}\n{}: {}'.format(
                 extension, type(e).__name__, e))
 
-    start(int(port), select_token(bot.config))
+    bot.run(select_token(bot.config))
 
 if __name__ == '__main__':
     main()
