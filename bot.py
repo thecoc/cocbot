@@ -26,6 +26,9 @@ async def on_ready():
 
 @bot.command()
 async def logout():
+    if os.getenv('IGNORELOGOUT', False):
+        return
+
     print('logout requested: shutting down...')
     await bot.logout()
 
