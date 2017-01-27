@@ -1,13 +1,12 @@
 from discord.ext import commands
 from cogs.utils import utils
+from cogs.utils import crypto
 import discord.utils as du
 import discord
 import json
 import threading
 import os
 import sys
-
-import crypto
 
 import logging
 logging.basicConfig(level=logging.INFO)
