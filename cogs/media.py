@@ -2,7 +2,7 @@ from discord.ext import commands
 from cogs.utils import tumblr, utils
 import random
 
-DEFAULT_COOLDOWN = 5
+DEFAULT_COOLDOWN = 60
 
 class Media:
 
