@@ -43,7 +43,7 @@ class Media:
     
     def cooldown_error(self, retry_after):
         error = ('Dude, you\'re interrupting my Netflix! '
-              + 'I should be free in {:.2f}s.'.format(retry_after)
+              + 'I should be free in {:.0f}s.'.format(retry_after)
               + ' Probably.')
         return error
 
