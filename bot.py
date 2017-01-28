@@ -1,9 +1,8 @@
 from discord.ext import commands
-from cogs.utils import utils, checks
-from cryptography.fernet import Fernet
+from cogs.utils import utils, checks, crypto
 import discord
-import json
 import os
+import sys
 
 extensions = [ 'cogs.games',
                'cogs.media',
@@ -38,9 +37,9 @@ async def on_command_error(error, ctx):
             channel = response.get('channel', ctx.message.channel)   
         #except (NameError, TypeError, ValueError, AttributeError):
         except Exception:
-            msg = 'wow, I didn\'t expect *that* to happen..'
-            msg += 'But don\'t worry. I just bitched to my people about it '
-            msg += '[ ' + str(error.original) + ' ]'
+            msg = ('wow, I didn\'t expect *that* to happen..'
+                + 'But don\'t worry. I just bitched to my people about it '
+                + '[ ' + str(error.original) + ' ]')
             msg = utils.mention(ctx, msg)
             channel = ctx.message.channel
             await utils.report_traceback(error, ctx)
@@ -51,30 +50,24 @@ async def on_message(msg):
     if msg.author.bot:
        return
     await bot.process_commands(msg)
-
-def load_json(file):
-    with open(file) as f:
-        return json.load(f)
-
-def read_bytes(file):
-    with open(file, 'rb') as f:
-        return f.read()
-        
-def recreate_json(file):
-    key = os.getenv('FERNET_KEY')
-    cipher_text = read_bytes('config.encrypted')
-    cipher_suite = Fernet(key.encode('utf-8'))
-    plain_text = cipher_suite.decrypt(cipher_text)
-    with open(file, 'w') as f:
-        f.write(plain_text.decode('utf-8'))
         
 if __name__ == '__main__':
 
     config_file = 'config.json'
     if not os.path.isfile(config_file):
-        recreate_json(config_file)
-    bot.config = load_json(config_file)
-    token = bot.config['token']
+        key = os.getenv('CRYPTOKEY', '').encode('utf-8')
+        crypto.file_decrypt(key, config_file)
+    bot.config = utils.load_json(config_file)
+    
+    if any('debug' in arg.lower() for arg in sys.argv):
+        try:
+            # maa env var on his machine
+            token = os.getenv('TOKEN_NAME')
+        except Exception:
+            # my token in config.json
+            token = bot.config['debug']
+    else:
+        token = bot.config['token']  
     
     for extension in extensions:
         try:

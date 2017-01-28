@@ -11,7 +11,7 @@ class Client:
     def get(self, method='info', **params):
         type = params.get('type')
         url = self.base_url + method + ('/' + type) if type else ''
-        params['api_key']=self.key
+        #params['api_key']=self.key
         return requests.get(url, params=params).json()
    
     def info(self):

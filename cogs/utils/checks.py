@@ -8,3 +8,9 @@ def is_owner_or_bot_admin():
         author_id = ctx.message.author.id
         return author_id in bot_admins or author_id == owner
     return commands.check(predicate)
+    
+def is_owner():
+    def predicate(ctx):
+        return ctx.message.author.id == ctx.bot.config['owner']
+    return commands.check(predicate)
+    
