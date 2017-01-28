@@ -17,7 +17,11 @@ method = crypto.file_encrypt
 if args.decrypt:
     method = crypto.file_decrypt
 
-cryptokey = os.getenv('CRYPTOKEY', '').encode('utf-8')
+crypto = os.getenv('CRYPTOKEY', None)
+if not crypto:
+    raise Exception('missing CRYPTOKEY')
+
+cryptokey = crypto.encode('utf-8')
 
 method(cryptokey, args.file, args.aes)
 
