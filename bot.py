@@ -1,15 +1,9 @@
 from discord.ext import commands
-from cogs.utils import utils
-from cogs.utils import crypto
+from cogs.utils import utils, checks, crypto
 import discord.utils as du
 import discord
-import json
-import threading
 import os
 import sys
-
-import logging
-logging.basicConfig(level=logging.INFO)
 
 extensions = [ 'cogs.games',
                'cogs.media',
@@ -25,13 +19,10 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
-
+    
+@checks.is_owner_or_bot_admin() 
 @bot.command()
 async def logout():
-    if os.getenv('IGNORELOGOUT', False):
-        return
-
-    print('logout requested: shutting down...')
     await bot.logout()
 
 @bot.event
@@ -47,9 +38,9 @@ async def on_command_error(error, ctx):
             channel = response.get('channel', ctx.message.channel)
         #except (NameError, TypeError, ValueError, AttributeError):
         except Exception:
-            msg = 'Well.. something went wrong. '
-            msg += 'Just so we\'re clear, it wasn\'t my fault. '
-            msg += '[ ' + str(error.original) + ' ]'
+            msg = ('wow, I didn\'t expect *that* to happen..'
+                + 'But don\'t worry. I just bitched to my people about it '
+                + '[ ' + str(error.original) + ' ]')
             msg = utils.mention(ctx, msg)
             channel = ctx.message.channel
 
@@ -62,43 +53,23 @@ async def on_message(msg):
     if msg.author.bot:
        return
     await bot.process_commands(msg)
+        
+if __name__ == '__main__':
 
-def load_json(file):
-    with open(file) as f:
-        return json.load(f)
-
-def assert_settings(cryptokey):
-    if not os.path.isfile('config.json'):
-        if os.path.isfile('config.json.aes'):
-            crypto.file_decrypt(cryptokey, 'config.json')
-        else:
-            raise Exception('missing: config.json')
-
-def select_token(config):
-    name = os.getenv('TOKEN_NAME', 'dbg')
-    token = config['token'][name]
-
-    if not token:
-        raise Exception('TOKEN_NAME(%s) not found in config.' % name)
-
-    return token
-
-def main():
-
-    cryptokey = os.getenv('CRYPTOKEY', '').encode('utf-8')
-
-    # handle differnt modes and cmd args
-    if len(sys.argv) == 3:
-        if sys.argv[1] == 'enc':
-            crypto.file_encrypt(cryptokey, sys.argv[2])
-            return
-        if sys.argv[1] == 'dec':
-            crypto.file_decrypt(cryptokey, sys.argv[2])
-            return
-
-    assert_settings(cryptokey)
-
-    bot.config = load_json('config.json')
+    config_file = 'config.json'
+    if not os.path.isfile(config_file):
+        key = os.getenv('CRYPTOKEY', '').encode('utf-8')
+        crypto.file_decrypt(key, config_file)
+    bot.config = utils.load_json(config_file)
+    
+    if any('debug' in arg.lower() for arg in sys.argv):
+        pass
+        # do stuff to get token
+        # os.env for maa
+        # config.log for z
+    else:
+        token = bot.config['token']  
+    
 
     for extension in extensions:
         try:
@@ -107,7 +78,5 @@ def main():
             print('Failed to load extension {}\n{}: {}'.format(
                 extension, type(e).__name__, e))
 
-    bot.run(select_token(bot.config))
+    bot.run(token)
 
-if __name__ == '__main__':
-    main()

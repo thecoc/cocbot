@@ -4,12 +4,12 @@ from cogs.utils import utils
 import discord
 import asyncio
 
-def transpose_aliases(aliases):
+def transpose_aliases(role_aliases):
     # mapping from each alias to their real role name
     # input is of form: {role: [aliases]}
     transposed = {}
-    for role, roles in aliases.items():
-        for alias in roles:
+    for role, aliases in role_aliases.items():
+        for alias in aliases:
             transposed[alias] = role
     return transposed
 
@@ -44,15 +44,14 @@ class Roles:
             msg = 'you can only have one tag. Don\'t be greedy'
             return {'msg':utils.mention(ctx, msg)}
         elif isinstance(error, commands.BadArgument):
-            msg = 'you\'re just making up words now. '
-            msg += self.role_error()
+            msg = 'you\'re just making up words now. ' +  self.role_error()
             return {'msg':utils.mention(ctx, msg)}
 
     async def modify_roles(self, ctx, role):
         member = ctx.message.author
         server_roles = ctx.message.server.roles
-        tags = {du.get(server_roles, name=r.title()) for r in self.roles}
-        new_roles = list(set(member.roles) - tags)
+        tags = [du.get(server_roles, name=r.title()) for r in self.roles]
+        new_roles = list(set(member.roles) - set(tags))
         new_role = du.get(server_roles, name=role.title())
         new_roles.append(new_role)
         await self.bot.replace_roles(member, *new_roles)
@@ -60,7 +59,6 @@ class Roles:
 
 
     def role_error(self):
-        #roles = map(lambda r: r.title(), self.roles)
         roles = [r.title() for r in self.roles]
         error = 'Allowed roles are: [ {} ]'.format(', '.join(roles))
         return error

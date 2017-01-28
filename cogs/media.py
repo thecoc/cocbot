@@ -2,7 +2,6 @@ from discord.ext import commands
 from cogs.utils import tumblr, utils
 import random
 
-# TODO: multiple cooldowns + error messages
 DEFAULT_COOLDOWN = 5
 
 class Media:
@@ -12,17 +11,16 @@ class Media:
         self.key = self.bot.config['tumblr']['key']
         self.blogname = self.bot.config['tumblr']['blogname']
         self.tag = self.bot.config['tumblr']['default_tag']
-        self.client = tumblr.Client(self.key, blogname=self.blogname)
-    
+        self.client = tumblr.Client(self.key, blogname=self.blogname)    
 
     @commands.command(
         brief='Request a random image from our Tumblr page')
     @commands.cooldown(1, DEFAULT_COOLDOWN)
     async def poster(self):
         post = self.random_post(tag=self.tag)
-        msg = post['summary'] + '\ntumblr post @ ' 
-        msg += '<' + post['short_url'] + '>\n'
-        msg += self.photo_set(post)
+        msg = (post['summary'] + '\ntumblr post @ ' 
+            + '<' + post['short_url'] + '>\n'
+            + self.photo_set(post))
         await self.bot.reply(msg)
 
     def prepare_error(self, error, ctx):
@@ -44,9 +42,9 @@ class Media:
         return self.random_photo(**params)['posts'][0]
     
     def cooldown_error(self, retry_after):
-        error = 'Dude, you\'re interrupting my Netflix! '
-        error += 'I\'ll get to whatever you asked for in: '
-        error += '{:.2f}s'.format(retry_after)
+        error = ('Dude, you\'re interrupting my Netflix! '
+              + 'I\'ll get to whatever you asked for in: '
+              + '{:.2f}s'.format(retry_after))
         return error
         
                        
