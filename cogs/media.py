@@ -43,11 +43,11 @@ class Media:
     
     def cooldown_error(self, retry_after):
         error = ('Dude, you\'re interrupting my Netflix! '
-              + 'I\'ll get to whatever you asked for in: '
-              + '{:.2f}s'.format(retry_after))
+              + 'I should be free in {:.2f}s.'.format(retry_after)
+              + ' Probably.')
         return error
-        
-                       
+
+
 def setup(bot):
     bot.add_cog(Media(bot))
 
