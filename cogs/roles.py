@@ -38,7 +38,7 @@ class Roles:
 
     def prepare_error(self, error, ctx):
         if isinstance(error, commands.MissingRequiredArgument):
-            msg = 'I can\'t tag nothing. I mean.. I could. I just don\'t want to'
+            msg = 'I can\'t tag nothing. I mean.. I could. I just don\'t want to' + self.role_error()
             return {'msg':utils.mention(ctx, msg)}
         elif isinstance(error, commands.TooManyArguments):
             msg = 'you can only have one tag. Don\'t be greedy'

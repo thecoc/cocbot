@@ -24,7 +24,7 @@ async def on_ready():
     print('------')
 
 @checks.is_owner_or_bot_admin()
-@bot.command()
+@bot.command(hidden=True)
 async def logout():
     if os.getenv('IGNORELOGOUT', False):
         return
