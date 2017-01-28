@@ -25,6 +25,3 @@ cryptokey = crypto.encode('utf-8')
 
 method(cryptokey, args.file, args.aes)
 
-
-
-
