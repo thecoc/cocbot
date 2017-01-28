@@ -5,6 +5,9 @@ import discord
 import os
 import sys
 
+import logging
+logging.basicConfig(level=logging.INFO)
+
 extensions = [ 'cogs.games',
                'cogs.media',
                'cogs.roles',
@@ -19,10 +22,14 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
-    
-@checks.is_owner_or_bot_admin() 
+
+@checks.is_owner_or_bot_admin()
 @bot.command()
 async def logout():
+    if os.getenv('IGNORELOGOUT', False):
+        return
+
+    print('logout requested: shutting down...')
     await bot.logout()
 
 @bot.event
@@ -53,23 +60,33 @@ async def on_message(msg):
     if msg.author.bot:
        return
     await bot.process_commands(msg)
-        
-if __name__ == '__main__':
 
-    config_file = 'config.json'
+
+def select_token(config, token_name=None):
+    name = token_name or os.getenv('TOKEN_NAME', 'dbg')
+    token = config['token'][name]
+
+    if not token:
+        raise Exception('TOKEN_NAME(%s) not found in config.' % name)
+
+    return token
+
+def load_config(config_file):
     if not os.path.isfile(config_file):
         key = os.getenv('CRYPTOKEY', '').encode('utf-8')
         crypto.file_decrypt(key, config_file)
-    bot.config = utils.load_json(config_file)
-    
-    if any('debug' in arg.lower() for arg in sys.argv):
-        pass
-        # do stuff to get token
-        # os.env for maa
-        # config.log for z
-    else:
-        token = bot.config['token']  
-    
+    return utils.load_json(config_file)
+
+
+if __name__ == '__main__':
+
+    bot.config = load_config('config.json')
+
+    token_name=None
+    if len(sys.argv) == 2:
+        token_name = sys.argv[1]
+
+    token = select_token(bot.config, token_name)
 
     for extension in extensions:
         try:
