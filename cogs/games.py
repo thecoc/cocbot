@@ -23,7 +23,7 @@ class Games:
         
     @commands.command(pass_context=True,
                       brief='Request a random conversation starter',
-                      help='I present the room with a random question for all to answer, so I can peer into your souls and steal your secrets. The questions aren\'t mine, but your secrets wiil be')
+                      help='I present the room with a random question for all to answer, so I can peer into your souls and steal your secrets. The questions aren\'t mine, but your secrets will be')
     async def topic(self, ctx):
         await self.bot.say(random_line(self.topics_url)) 
 
