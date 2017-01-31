@@ -2,6 +2,14 @@ from discord.ext import commands
 from cogs.utils import utils
 import discord.utils as du
 import discord
+import re
+
+def combine_words(words):
+    """Compiles list of words into a regex object
+    that matches any of them. (whole words only)
+    """
+    regx = '|'.join(r"\b%s\b" % w for w in words)
+    return re.compile(regx, flags=re.IGNORECASE)
 
 class BadWords:
 
@@ -9,13 +17,14 @@ class BadWords:
         self.bot = bot
         self.badwords_url = self.bot.config['urls']['badwords']
         self.badwords = utils.lines_from_url(self.badwords_url)
+        self.re_badwords = combine_words(self.badwords)
         
     async def on_message(self, msg):
         
         if msg.author.bot:
             return
        
-        words = [w for w in self.badwords if w in msg.content]
+        words = self.re_badwords.findall(msg.content)
         
         if not words:
             return
