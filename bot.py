@@ -1,9 +1,10 @@
 from discord.ext import commands
-from cogs.utils import utils, checks, crypto
+from cogs.utils import utils, crypto
 import discord.utils as du
 import discord
 import os
 import sys
+import random
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -11,10 +12,11 @@ logging.basicConfig(level=logging.INFO)
 extensions = [ 'cogs.games',
                'cogs.media',
                'cogs.roles',
-               'cogs.badwords' ]
+               'cogs.badwords',
+               'cogs.admin' ]
 
 prefix = [ '!' ]
-bot = commands.Bot(command_prefix=prefix, pm_help=True)
+bot = commands.Bot(command_prefix=prefix)
 
 @bot.event
 async def on_ready():
@@ -22,39 +24,31 @@ async def on_ready():
     print('Username: ' + bot.user.name)
     print('ID: ' + bot.user.id)
     print('------')
-
-@checks.is_owner_or_bot_admin()
-@bot.command(hidden=True)
-async def logout():
-    if os.getenv('IGNORELOGOUT', False):
-        return
-
-    print('logout requested: shutting down...')
-    await bot.logout()
+    
 
 @bot.event
 async def on_command_error(error, ctx):
-    if isinstance(error, commands.CommandNotFound):
-        msg = 'How dare you ask me for that. I\'m not that kind of bot!'
-        msg = utils.mention(ctx, msg)
-        channel = ctx.message.channel
+    etype = type(error).__name__
+    handler = ctx.command.name if ctx.command else 'global'
+    extra_help = bot.errors[handler]['extra_help']
+    
+    unknown_error = bot.errors['global']['unknown']
+    error_choices = bot.errors[handler].get(etype, unknown_error)
+    
+    msg = random.choice(error_choices) 
+    
+    # no clue what happened, so report the traceback
+    if msg in unknown_error:
+        await utils.report_traceback(error, ctx)
     else:
-        try:
-            response = ctx.cog.prepare_error(error, ctx)
-            msg = response['msg']
-            channel = response.get('channel', ctx.message.channel)
-        #except (NameError, TypeError, ValueError, AttributeError):
-        except Exception:
-            msg = ('wow, I didn\'t expect *that* to happen..'
-                + 'But don\'t worry. I just bitched to my people about it '
-                + '[ ' + str(error.original) + ' ]')
-            msg = utils.mention(ctx, msg)
-            channel = ctx.message.channel
+        # extra processing from cog if needed
+        if extra_help:
+            msg = ctx.cog.error(error, ctx, msg)
+            
+    msg = utils.mention(ctx, msg)
+    await bot.send_message(ctx.message.channel, msg)
 
-            await utils.report_traceback(error, ctx)
-
-    await bot.send_message(channel, msg)
-
+    
 @bot.event
 async def on_message(msg):
     if msg.author.bot:
@@ -71,6 +65,7 @@ def select_token(config, token_name=None):
 
     return token
 
+    
 def load_config(config_file):
     if not os.path.isfile(config_file):
         key = os.getenv('CRYPTOKEY', '').encode('utf-8')
@@ -81,10 +76,12 @@ def load_config(config_file):
 if __name__ == '__main__':
 
     bot.config = load_config('config.json')
-
+    bot.errors = bot.config['errors']
+    
     token_name=None
     if len(sys.argv) == 2:
         token_name = sys.argv[1]
+        bot.command_prefix = '?'
 
     token = select_token(bot.config, token_name)
 
