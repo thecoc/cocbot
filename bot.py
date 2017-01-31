@@ -30,7 +30,7 @@ async def on_ready():
 async def on_command_error(error, ctx):
     etype = type(error).__name__
     handler = ctx.command.name if ctx.command else 'global'
-    extra_help = bot.errors[handler]['extra_help']
+    is_template = bot.errors[handler].get('is_template', False)
     
     unknown_error = bot.errors['global']['unknown']
     error_choices = bot.errors[handler].get(etype, unknown_error)
@@ -42,7 +42,7 @@ async def on_command_error(error, ctx):
         await utils.report_traceback(error, ctx)
     else:
         # extra processing from cog if needed
-        if extra_help:
+        if is_template:
             msg = ctx.cog.error(error, ctx, msg)
             
     msg = utils.mention(ctx, msg)
