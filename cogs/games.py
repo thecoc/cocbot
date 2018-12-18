@@ -12,7 +12,8 @@ class Games:
     def __init__(self, bot):
         self.bot = bot
         self.eightball_url = self.bot.config['urls']['8ball']
-        self.topics_url = self.bot.config['urls']['topics']
+        self.topics_url = self.bot.config['urls']['topics']]
+        self.posters_url = self.bot.config['urls']['2017']
         
         
     async def on_ready(self):
@@ -27,6 +28,12 @@ class Games:
     async def _8ball(self, ctx, *, question):
         await self.bot.reply(random_line(self.eightball_url))
 
+    @commands.command(name = '2017', 
+                      pass_context=True, 
+                      brief='Request a random CoC Poster',
+                      description='Here\'s a random poster.')
+    async def _2017(self, ctx):
+        await self.bot.reply(random_line(self.posters_url))
         
     @commands.command(pass_context=True,
                       brief='Request a random conversation starter',
